@@ -19,7 +19,8 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 	private Task? _receiveLoopTask;
 	private readonly CancellationTokenSource _cancellationTokenSource = new();
 	private bool _disposed;
-	private readonly Lock _disposeLock = new();
+	// System.Threading.Lock is net9+; plain object monitor is equivalent for lock().
+	private readonly object _disposeLock = new();
 
 	public void Start(CancellationToken cancellationToken)
 	{

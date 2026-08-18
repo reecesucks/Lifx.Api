@@ -8,7 +8,8 @@ using Lifx.Api.Models.Lan;
 public partial class LifxLanClient : IDisposable
 {
 	private static uint identifier = 2;
-	private static readonly Lock identifierLock = new();
+	// System.Threading.Lock is net9+; plain object monitor is equivalent for lock().
+	private static readonly object identifierLock = new();
 	private uint discoverSourceID;
 	private CancellationTokenSource? _DiscoverCancellationSource;
 	private readonly Dictionary<string, Device> _discoveredBulbs = [];
