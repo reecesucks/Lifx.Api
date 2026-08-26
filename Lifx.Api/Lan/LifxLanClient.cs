@@ -35,7 +35,13 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 			var end = new IPEndPoint(IPAddress.Any, Port);
 			_socket = new UdpClient(end);
 			_socket.Client.Blocking = false;
-			_socket.DontFragment = true;
+			// IP_DONTFRAGMENT is not supported on macOS: setting it throws
+			// SocketException(45) "Operation not supported". LIFX LAN packets are
+			// far below the MTU, so fragmentation control is not needed here.
+			if (!OperatingSystem.IsMacOS())
+			{
+				_socket.DontFragment = true;
+			}
 			_socket.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
 			_receiveLoopTask = ReceiveLoopAsync(cancellationToken);
 			logger.LogTrace("Initialization complete.");
@@ -232,7 +238,10 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 			header.Identifier > 0 &&
 			typeof(T) != typeof(UnknownResponse))
 		{
-			tcs = new TaskCompletionSource<T>();
+			// Without this the awaiter's continuation runs inline on the receive
+			// loop below, which is the only thread draining the socket - a caller's
+			// whole completion chain would then block every other bulb's reply.
+			tcs = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
 			void action(LifxResponse r)
 			{
 				if (r.GetType() == typeof(T))
@@ -268,7 +277,7 @@ public partial class LifxLanClient(ILogger logger) : IDisposable
 			}
 			finally
 			{
-				taskCompletions.Remove(header.Identifier);
+				taskCompletions.TryRemove(header.Identifier, out _);
 			}
 		}
 

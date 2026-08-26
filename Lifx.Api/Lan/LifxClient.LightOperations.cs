@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 
 namespace Lifx.Api.Lan;
 
@@ -7,7 +8,10 @@ using Lifx.Api.Models.Lan;
 
 public partial class LifxLanClient : IDisposable
 {
-	private readonly Dictionary<uint, Action<LifxResponse>> taskCompletions = [];
+	// Written by every in-flight request (the HDMI colour matcher alone puts ~50
+	// insert/remove pairs a second through here, one per bulb per frame) and read
+	// by the UDP receive loop. A plain Dictionary corrupts under that.
+	private readonly ConcurrentDictionary<uint, Action<LifxResponse>> taskCompletions = [];
 
 	/// <summary>
 	/// Turns a bulb on or off using the provided transition time
