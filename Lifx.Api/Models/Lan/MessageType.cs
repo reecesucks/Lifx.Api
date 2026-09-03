@@ -49,6 +49,15 @@ internal enum MessageType : ushort
 	InfraredState = 121,
 	InfraredSet = 122,
 
+	//MultiZone
+	SetColorZones = 501,
+	GetColorZones = 502,
+	StateZone = 503,
+	StateMultiZone = 506,
+	SetExtendedColorZones = 510,
+	GetExtendedColorZones = 511,
+	StateExtendedColorZones = 512,
+
 	//Unofficial
 	LightGetTemperature = 0x6E,
 	//LightStateTemperature = 0x6f,
