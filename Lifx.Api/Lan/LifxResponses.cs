@@ -22,6 +22,9 @@ public abstract class LifxResponse
 			MessageType.DeviceStateHostFirmware => new StateHostFirmwareResponse(header, type, payload, source),
 			MessageType.DeviceStateService => new StateServiceResponse(header, type, payload, source),
 			MessageType.DeviceStateGroup => new LightGroupResponse(header, type, payload, source),
+			MessageType.StateZone => new StateZoneResponse(header, type, payload, source),
+			MessageType.StateMultiZone => new StateMultiZoneResponse(header, type, payload, source),
+			MessageType.StateExtendedColorZones => new StateExtendedColorZonesResponse(header, type, payload, source),
 			_ => new UnknownResponse(header, type, payload, source),
 		};
 

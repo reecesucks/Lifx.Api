@@ -14,7 +14,8 @@ public static class LanCommand
 		{
 			CreateDiscoverCommand(),
 			CreateListCommand(),
-			CreateLightsCommand()
+			CreateLightsCommand(),
+			LanZonesCommand.Create()
 		};
 
 		command.Description =
@@ -264,7 +265,7 @@ public static class LanCommand
 		return command;
 	}
 
-	private static async Task<LightBulb?> DiscoverAndFindBulb(LifxClient client, string macAddress)
+	internal static async Task<LightBulb?> DiscoverAndFindBulb(LifxClient client, string macAddress)
 	{
 		// Normalize MAC address
 		macAddress = macAddress.ToUpperInvariant().Replace("-", ":").Replace(".", ":");
